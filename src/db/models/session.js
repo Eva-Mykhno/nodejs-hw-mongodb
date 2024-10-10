@@ -4,8 +4,8 @@ const sessionsSchema = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: 'users',
       required: true,
+      ref: 'users',
     },
     accessToken: {
       type: String,
@@ -30,4 +30,4 @@ const sessionsSchema = new Schema(
   },
 );
 
-export const Session = model('sessions', sessionsSchema);
+export const SessionCollection = model('sessions', sessionsSchema);

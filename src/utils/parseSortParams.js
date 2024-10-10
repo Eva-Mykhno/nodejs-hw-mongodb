@@ -18,7 +18,7 @@ const parseSortBy = (sortBy) => {
     'updatedAt',
   ];
 
-  if (keyOfContact) {
+  if (keyOfContact.includes(sortBy)) {
     return sortBy;
   }
 

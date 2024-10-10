@@ -27,8 +27,8 @@ const contactsSchema = new Schema(
     },
     userId: {
       type: Schema.Types.ObjectId,
-      ref: 'users',
       required: true,
+      ref: 'users',
     },
   },
   {
@@ -37,4 +37,4 @@ const contactsSchema = new Schema(
   },
 );
 
-export const contactsCollection = model('contacts', contactsSchema);
+export const ContactsCollection = model('contacts', contactsSchema);
