@@ -2,8 +2,12 @@ import createHttpError from 'http-errors';
 import { UserCollection } from '../db/models/user.js';
 import bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
-import { FIFTEEN_MINUTES, ONE_MONTH } from '../constants/index.js';
+import jwt from 'jsonwebtoken';
+import { FIFTEEN_MINUTES, JWT, ONE_MONTH, SMTP } from '../constants/index.js';
 import { SessionCollection } from '../db/models/session.js';
+import { env } from '../utils/env.js';
+import { emailClient } from '../utils/emailClient.js';
+import { generateResetPasswordEmail } from '../utils/generateResetPasswordEmail.js';
 
 export const registerUser = async (payload) => {
   const user = await UserCollection.findOne({ email: payload.email });
@@ -84,4 +88,66 @@ export const refreshUserSession = async ({ sessionId, refreshToken }) => {
     userId: session.userId,
     ...newSession,
   });
+};
+
+export const requestResetToken = async (email) => {
+  const user = await UserCollection.findOne({ email });
+  if (!user) {
+    throw createHttpError(404, 'User not found');
+  }
+
+  const resetToken = jwt.sign(
+    {
+      sub: user._id,
+      email,
+    },
+    env(JWT.JWT_SECRET),
+    {
+      expiresIn: 60 * 5,
+    },
+  );
+
+  const resetLink = `${env(JWT.APP_DOMAIN)}/reset-password?token=${resetToken}`;
+
+  try {
+    await emailClient.sendMail({
+      from: env(SMTP.SMTP_FROM),
+      to: email,
+      subject: 'Reset your password',
+      html: generateResetPasswordEmail({
+        name: user.name,
+        resetLink: resetLink,
+      }),
+    });
+  } catch (error) {
+    console.log(error);
+    throw createHttpError(
+      500,
+      'Failed to send the email, please try again later.',
+    );
+  }
+};
+
+export const resetPassword = async ({ token, password }) => {
+  let payload;
+  try {
+    payload = jwt.verify(token, env(JWT.JWT_SECRET));
+  } catch (error) {
+    if (error instanceof Error)
+      throw createHttpError(401, 'Token is expired or invalid.');
+    throw error;
+  }
+
+  const user = await UserCollection.findById(payload.sub);
+  if (!user) {
+    throw createHttpError(404, 'User not found');
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  await UserCollection.findByIdAndUpdate(user._id, {
+    password: hashedPassword,
+  });
+
+  await SessionCollection.deleteMany({ userId: user._id });
 };
