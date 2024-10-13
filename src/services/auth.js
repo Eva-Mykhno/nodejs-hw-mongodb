@@ -149,5 +149,5 @@ export const resetPassword = async ({ token, password }) => {
     password: hashedPassword,
   });
 
-  await SessionCollection.deleteMany({ userId: user._id });
+  // await SessionCollection.deleteMany({ userId: user._id });
 };
