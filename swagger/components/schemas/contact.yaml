@@ -10,7 +10,7 @@ properties:
   _id:
     description: "Contact's id"
     type: string
-    example: 66e6ab59a446cfa04c713fa8
+    example: 65ca67e7ae7f10c88b598384
   name:
     description: "Contact's name"
     type: string
@@ -34,7 +34,7 @@ properties:
   userId:
     description: "Contact's user id"
     type: string
-    example: 66e6ab59a446cfa04c713fa8
+    example: 65ca67e7ae7f10c88b598384
   photo:
     description: "Link to contact's photo"
     type: string

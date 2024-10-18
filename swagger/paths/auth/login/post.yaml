@@ -1,0 +1,51 @@
+tags:
+  - Auth
+summary: Login user
+operationId: loginUser
+description: 'Login a user and return token'
+security:
+  - bearerAuth: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - email
+          - password
+        properties:
+          email:
+            type: string
+            description: 'User email'
+            example: 'user@gmail.com'
+          password:
+            type: string
+            description: 'User password'
+            example: 'password123'
+responses:
+  '200':
+    description: Successfully logged in
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+            - data
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Successfully logged in!
+            data:
+              type: object
+              properties:
+                token:
+                  type: string
+                  example: 'e3pmN71Bg/U5xxzSd8hFX...'
+  '401':
+    $ref: '../../../components/responses/401.yaml'
