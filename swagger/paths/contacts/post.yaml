@@ -36,7 +36,7 @@ requestBody:
             example: false
           contactType:
             description: "Contact's type"
-            type: boolean
+            type: string
             enum: ['work', 'home', 'personal']
           userId:
             description: "Contact's user id"
